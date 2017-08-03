@@ -1,3 +1,5 @@
+import sys
+sys.setrecursionlimit(10000)
 import random
 
 def bound(seq, index):
@@ -36,7 +38,7 @@ def gen(mega, columns_index, rows_index):
     ### assign indexes to cells
 
     count = 0
-    for i in range(0,54,9):
+    for i in range(0,81,9):
         for j in range(i,i+9):
             label = bound(columns_index, j)
             mega[j] = Generate(columns_index[label])
@@ -65,46 +67,56 @@ def gen(mega, columns_index, rows_index):
 def operations(mega, i):
     """ choose an integer and update row, column , and quadrant"""
 
-    if i < 54:
-
-        complete = {1,2,3,4,5,6,7,8,9}
-        current = {0}
-        row_integer = mega[i].row
-        column_integer = mega[i].column
-        quadrant_integer = mega[i].quadrant
-            
-        for k in range(54):
-            if mega[k].row == row_integer or mega[k].column == column_integer or mega[k].quadrant == quadrant_integer:
-                current.add(mega[k].value)
-        mega[i].numbers = complete - (current | mega[i].chosen)
+    while (True):
+        if i < 81:
     
-        if  mega[i].numbers != set():
-    
-            mega[i].value = random.choice(list(mega[i].numbers))
-            value = mega[i].value
-            mega[i].chosen.add(value)
-            
-    
-            i += 1
-            operations(mega,i)
-    
+            complete = {1,2,3,4,5,6,7,8,9}
+            current = {0}
+            row_integer = mega[i].row
+            column_integer = mega[i].column
+            quadrant_integer = mega[i].quadrant
+                
+            for k in range(81):
+                if mega[k].row == row_integer or mega[k].column == column_integer or mega[k].quadrant == quadrant_integer:
+                    current.add(mega[k].value)
+            mega[i].numbers = complete - (current | mega[i].chosen)
+        
+            if  mega[i].numbers != set():
+        
+                mega[i].value = random.choice(list(mega[i].numbers))
+                value = mega[i].value
+                mega[i].chosen.add(value)
+                
+        
+                i += 1
+                if (operations(mega,i)):
+                    return True
+                else:
+        
+                    i -= 2
+                    for j in range(i+1,81):
+                        mega[j].chosen = {0}
+                        mega[j].value = 0
+                    continue
+            else:
+                return False
+#        else:
+#    
+#            i -= 2
+#            for j in range(i+1,54):
+#                mega[j].chosen = {0}
+#                mega[j].value = 0
+#    
+#            operations(mega, i)
         else:
-    
-            i -= 2
-            for j in range(i+1,54):
-                mega[j].chosen = {0}
-                mega[j].value = 0
-    
-            operations(mega, i)
-    else:
-        return        
+            return True       
         
         
 
 def display(mega):
     """ print the nine by nine table"""
 
-    for i in range(0,54,9):
+    for i in range(0,81,9):
         for j in range(i,i+9):
 #            print('{}{}{}{} '.format(mega[j].value,mega[j].quadrant,mega[j].column,mega[j].row), end="")
             print(mega[j].value, end= "     ")
@@ -112,7 +124,7 @@ def display(mega):
 
 def main():
 
-    mega = [0]*54
+    mega = [0]*81
     columns_index = ['A','B','C','D','E','F','G','H','I']
     rows_index = ['a','b','c','d','e','f','g','h','i']
 
